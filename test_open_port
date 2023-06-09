@@ -1,0 +1,49 @@
+import socket
+import time
+
+# Initial values to use
+retry = 3
+delay = 5
+timeout = 3
+
+
+def isOpen(ip, port, timeout):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(timeout)
+    try:
+        s.connect((ip, int(port)))
+        s.shutdown(socket.SHUT_RDWR)
+        return True
+    except:
+        return False
+    finally:
+        s.close()
+
+
+def checkHost(self, root, ip, port, retry, delay, timeout):
+    ipup = False
+    for i in range(retry):
+        if isOpen(ip, port, timeout):
+            ipup = True
+            break
+        else:
+            time.sleep(delay)
+
+    if ipup:
+        msg = f"{ip} is UP"
+        root.mainframe.ResultFrame.result.set(msg)
+        if len(msg) > 26:
+            # Resize for large URLs
+            root.mainframe.ResultFrame.label.configure(foreground="#389319", font=("segoe UI", 12))
+        else:
+            root.mainframe.ResultFrame.label.configure(foreground="#389319", font=("segoe UI", 14))
+
+    else:
+        msg = f"{ip} does NOT appear up"
+        root.mainframe.ResultFrame.result.set(msg)
+        if len(msg) > 26:
+            # Resize for large URLs
+            root.mainframe.ResultFrame.label.configure(foreground="#d80020", font=("segoe UI", 10))
+        else:
+            root.mainframe.ResultFrame.label.configure(foreground="#d80020", font=("segoe UI", 14))
+    self.button["state"] = "enabled"
